@@ -11,18 +11,26 @@ apply plugin: 'java'
 
 // Apply the application plugin to add support for building an application
 apply plugin: 'application'
-
+apply plugin: "com.adarshr.test-logger"
 // In this section you declare where to find the dependencies of your project
 repositories {
 // Use jcenter for resolving your dependencies.
 // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
-
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.adarshr:gradle-test-logger-plugin:1.6.0"
+  }
+}
 dependencies {
 // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:23.0'
-
 // Use JUnit test framework
     testCompile 'junit:junit:4.12'
     // https://mvnrepository.com/artifact/org.mockito/mockito-all

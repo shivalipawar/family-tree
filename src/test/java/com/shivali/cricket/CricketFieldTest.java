@@ -35,7 +35,7 @@ public class CricketFieldTest {
         cricketField.setOnStrike(player);
         cricketField.setTotalOvers(4);
         cricketField.setTargetScore(10);
-        cricketField.setCurrentScore(5);
+        cricketField.increaseScore(5);
         String result =cricketField.perOverCommentary(1);
         Assert.assertEquals("3 overs left. 5 runs to win",result);
     }

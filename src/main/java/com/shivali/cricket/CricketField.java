@@ -2,6 +2,9 @@ package com.shivali.cricket;
 
 import com.shivali.cricket.model.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class CricketField {
 
     private Player onStrike;
@@ -11,33 +14,35 @@ class CricketField {
     private int totalWickets;
     private int wicketsDown;
     private int oversCompleted;
+    private int totalOvers;
 
-    public CricketField(){}
+    CricketField() {
+    }
 
-    public CricketField(int wicketsDown,int oversComplete, Player onStrike, Player offStrike,int totalOvers,int targetScore,int totalWickets){
-        this.setWicketsDown(wicketsDown);
-        this.setOversCompleted(oversComplete);
-        this.setOnStrike(onStrike);
-        this.setOffStrike(offStrike);
-        this.setTotalOvers(totalOvers);
-        this.setTargetScore(targetScore);
-        this.setTotalWickets(totalWickets);
+    CricketField(List<Player> players, int totalOvers, int targetScore) {
+        this.wicketsDown = 0;
+        this.oversCompleted = 0;
+        this.onStrike = players.get(0);
+        this.offStrike = players.get(1);
+        this.totalOvers = totalOvers;
+        this.targetScore = targetScore;
+        this.totalWickets = players.size() - 2;
     }
 
     int getTotalOvers() {
         return totalOvers;
     }
 
+    //TODo Delete this only used in test
     void setTotalOvers(int totalOvers) {
         this.totalOvers = totalOvers;
     }
-
-    private int totalOvers;
 
     Player getOnStrike() {
         return onStrike;
     }
 
+    //TODo Delete this only used in test
     void setOnStrike(Player onStrike) {
         this.onStrike = onStrike;
     }
@@ -46,22 +51,20 @@ class CricketField {
         return offStrike;
     }
 
-    void setOffStrike(Player offStrike) {
-        this.offStrike = offStrike;
-    }
-
     int getCurrentScore() {
         return currentScore;
     }
 
-    void setCurrentScore(int currentScore) {
-        this.currentScore = currentScore;
+    //TODo Unit test
+    void increaseScore(int score) {
+        this.currentScore += score;
     }
 
     int getTargetScore() {
         return targetScore;
     }
 
+    //TODo Delete this only used in test
     void setTargetScore(int targetScore) {
         this.targetScore = targetScore;
     }
@@ -87,19 +90,22 @@ class CricketField {
     }
 
     String perOverCommentary(int currentOver) {
-        return "" + (totalOvers - currentOver)  + " overs left. " + (targetScore -currentScore) + " runs to win";
+        return "" + (totalOvers - currentOver) + " overs left. " + (targetScore - currentScore) + " runs to win";
     }
 
     int getOversCompleted() {
         return oversCompleted;
     }
 
-    void setOversCompleted(int i) {
-        this.oversCompleted = i;
+    //TODO Unit test
+    void markEndOfOver() {
+        this.oversCompleted--;
     }
 
-    private void setTotalWickets(int totalWickets) {
-        this.totalWickets = totalWickets;
+    //TODo Unit test.
+    void changeStrike() {
+        Player currentPlayer = this.getOnStrike();
+        this.onStrike = this.offStrike;
+        this.offStrike = currentPlayer;
     }
-
 }

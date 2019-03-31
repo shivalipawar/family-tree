@@ -13,6 +13,8 @@ public class Player {
         this.playerName = playerName;
         this.playerProbability = playerProbability;
     }
+
+    //TODo Delete this only used in test
     public Player(){
 
     }
@@ -29,8 +31,9 @@ public class Player {
         return currentScore;
     }
 
-    public void setCurrentScore(int currentScore) {
-        this.currentScore = currentScore;
+    //TODo Unit test
+    public void increaseScore(int score) {
+        this.currentScore += score;
     }
 
     public int getNumberOfBalls() {

@@ -9,17 +9,17 @@ class CricketMatch {
     private String teamName;
     private WeightedRandomGenerator scorer;
     private CricketField cricketField;
-    private final ArrayList<Player> linedUpPlayers;
-    private final ArrayList<Player> playedPlayers;
-    private final ArrayList<Player> notOutPlayers;
+    private ArrayList<Player> linedUpPlayers;
+    private ArrayList<Player> playedPlayers;
+    private ArrayList<Player> notOutPlayers;
 
     CricketMatch(String teamName, WeightedRandomGenerator scorer, CricketField cricketField, ArrayList<Player> linedUpPlayers) {
         this.teamName = teamName;
         this.scorer = scorer;
         this.cricketField = cricketField;
         this.linedUpPlayers = linedUpPlayers;
-        this.playedPlayers = new ArrayList();
-        this.notOutPlayers = new ArrayList();
+        this.playedPlayers = new ArrayList<>();
+        this.notOutPlayers = new ArrayList<>();
     }
 
     IGameResult play() {
@@ -27,12 +27,12 @@ class CricketMatch {
             IGameResult updatedGameResult = playOver(over);
             if (isGameEnded(updatedGameResult)) return updatedGameResult;
             System.out.println(cricketField.perOverCommentary(over));
-            cricketField.setOversCompleted(cricketField.getTotalOvers()-1);
-            changeStrike();
+            cricketField.markEndOfOver();
+            cricketField.changeStrike();
         }
         notOutPlayers.add(cricketField.getOffStrike());
         notOutPlayers.add(cricketField.getOnStrike());
-        return new MatchLost(teamName, cricketField.getTargetScore() - cricketField.getCurrentScore(),this.playedPlayers, this.notOutPlayers);
+        return new MatchLost(teamName, cricketField.getTargetScore() - cricketField.getCurrentScore(), this.playedPlayers, this.notOutPlayers);
     }
 
     private boolean isGameEnded(IGameResult updatedGameResult) {
@@ -40,27 +40,26 @@ class CricketMatch {
     }
 
     private IGameResult playOver(int overNumber) {
-        int ballsCompleted = 0;
         for (int ball = 1; ball <= 6; ball++) {
-            int score = scorer.getWeightedRandomNumber(cricketField.getOnStrike().getPlayerProbability());
-            ballsCompleted++;
-            cricketField.getOnStrike().setNumberOfBalls(cricketField.getOnStrike().getNumberOfBalls()+1);
-            if (isLastPlayersWicket(score,overNumber,ball)) {
-                this.playedPlayers.add(cricketField.getOnStrike()); //if its notOutPlayer or playedPlayer
+            Player onStrike = cricketField.getOnStrike();
+            int score = scorer.getWeightedRandomNumber(onStrike.getPlayerProbability());
+            onStrike.setNumberOfBalls(onStrike.getNumberOfBalls() + 1);
+            if (isLastPlayersWicket(score, overNumber, ball)) {
+                this.playedPlayers.add(onStrike); //if its notOutPlayer or playedPlayer
                 this.notOutPlayers.add(cricketField.getOffStrike());
-                return new MatchLost(teamName, cricketField.getTargetScore() - cricketField.getCurrentScore(), this.playedPlayers,this.notOutPlayers);
+                return new MatchLost(teamName, cricketField.getTargetScore() - cricketField.getCurrentScore(), this.playedPlayers, this.notOutPlayers);
             }
             updateScore(score);
 
             if (score != -1) {
                 printPerBallCommentary(overNumber, ball, score);
             }
-            if (shouldChangeStrike(score)) changeStrike();
+            if (shouldChangeStrike(score)) cricketField.changeStrike();
 
-            if (gameWonResult()){
+            if (gameWonResult()) {
                 notOutPlayers.add(cricketField.getOffStrike());
-                notOutPlayers.add(cricketField.getOnStrike());
-                return new MatchWon(teamName, cricketField.getTotalWickets() - cricketField.getWicketsDown(), cricketField.getTotalOvers() - cricketField.getOversCompleted(), 6 - ballsCompleted,this.playedPlayers,this.notOutPlayers);
+                notOutPlayers.add(onStrike);
+                return new MatchWon(teamName, cricketField.getTotalWickets() - cricketField.getWicketsDown(), cricketField.getTotalOvers() - cricketField.getOversCompleted(), 6 - ball, this.playedPlayers, this.notOutPlayers);
             }
         }
         return null;
@@ -71,19 +70,20 @@ class CricketMatch {
     }
 
     private void handleAndPrintWicketCommentary(int overNumber, int ball, String playerName) {
-        System.out.println(cricketField.perWicketCommentary(overNumber, ball,playerName));
+        System.out.println(cricketField.perWicketCommentary(overNumber, ball, playerName));
     }
+
     private boolean shouldChangeStrike(int score) {
         return score == 1 || score == 3 || score == 5;
     }
 
-    private boolean isLastPlayersWicket(int score,int overNumber,int ball) {
+    private boolean isLastPlayersWicket(int score, int overNumber, int ball) {
         if (score == -1) {
-            handleAndPrintWicketCommentary(overNumber, ball,cricketField.getOnStrike().getPlayerName());
+            handleAndPrintWicketCommentary(overNumber, ball, cricketField.getOnStrike().getPlayerName());
             if (linedUpPlayers.size() == 0) {
                 return true;
             }
-            changeOfOnStrikePlayerWithLinedUp(linedUpPlayers,playedPlayers);
+            changeOfOnStrikePlayerWithLinedUp(linedUpPlayers, playedPlayers);
         }
         return false;
     }
@@ -94,8 +94,8 @@ class CricketMatch {
 
     private void updateScore(int score) {
         if (score > 0) {
-            cricketField.setCurrentScore(cricketField.getCurrentScore() + score);
-            cricketField.getOnStrike().setCurrentScore(cricketField.getOnStrike().getCurrentScore() + score);
+            cricketField.increaseScore(score);
+            cricketField.getOnStrike().increaseScore(score);
         }
     }
 
@@ -108,10 +108,5 @@ class CricketMatch {
         }
     }
 
-    private void changeStrike() {
-        Player currentPlayer = cricketField.getOnStrike();
-        cricketField.setOnStrike(cricketField.getOffStrike());
-        cricketField.setOffStrike(currentPlayer);
-    }
 
 }
