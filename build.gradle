@@ -39,12 +39,12 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'Game'
+mainClassName = 'FamilyTreeSimulator'
 
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.shivali.cricket.Game'
+                'Main-Class': 'com.shivali.familytree.FamilyTreeSimulator'
         )
     }
 }
